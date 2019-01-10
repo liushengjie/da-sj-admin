@@ -27,22 +27,17 @@
 				 show-total size="small" />
 			</div>
 		</div>
-		<ds-firstmodel ref="dsFirstModel" @NewBuild='NewBuildEmit'></ds-firstmodel>
-		<ds-model :dataMode="searchParam.dataMode" ref="dsModel"></ds-model>
-		<excel-modal :dataMode="searchParam.dataMode" ref="excelModal"></excel-modal>
+		<first-model ref="firstModel"></first-model>
 	</div>
 </template>
+
 <script>
 	import * as dbApi from '@/api/dataSource'
-	import dsModel from '@/view/dataSource/components/ds_model'
-	import dsFirstmodel from '@/view/dataSource/components/dsFirstmodel'
-	import excelModal from '@/view/dataSource/components/excel_model'
+	import firstModel from '@/view/dataSource/components/first_model'
 
 	export default {
 		components: {
-			dsModel,
-			dsFirstmodel,
-			excelModal
+			firstModel,
 		},
 		data() {
 			return {
@@ -148,21 +143,14 @@
 					currentPage: 1,
 					pageSize: 10
 				},
-				typeList: [],
-				buildType: {} // 返回的新建类型
+				typeList: [], //下拉框数据
 			}
 		},
 		mounted() {
-			this.getDsList(1)
-			this.getDsType()
+			this.getDsList(1) //数据源列表数据
+			this.getDsType() //下拉框
 		},
-		watch: {
-			buildType(v1) {
-				const _this = this
-				this.$refs.dsModel.modalTitle = v1.name
-				this.$refs.dsModel.modalShow = true
-			}
-		},
+		watch: {},
 		methods: {
 			// 获取列表数据
 			getDsList(pageIndex) {
@@ -170,12 +158,6 @@
 				_this.searchParam.currentPage = pageIndex
 				dbApi.getDsList(_this.searchParam).then(res => {
 					if (res.success) {
-						//					res.data.list.forEach(t =>{
-						//						if(t.type == '3') {
-						//							t.database = ''
-						//							t.username = ''
-						//						}
-						//					})
 						_this.tableData = res.data.list
 						_this.tableDataCount = res.data.total
 					}
@@ -195,15 +177,8 @@
 			},
 			// 弹出新建弹窗
 			showNewModel() {
-				this.$refs.dsFirstModel.modelTitle = '新增'
-				this.$refs.dsFirstModel.modelShow = true
-			},
-			NewBuildEmit: function (arr) {
-				if (arr.name === '新建Excel') {
-					this.$refs.excelModal.modalShow = true
-					return
-				}
-				this.buildType = arr
+				this.$refs.firstModel.modelTitle = '新增'
+				this.$refs.firstModel.modelShow = true
 			},
 			// 删除数据源
 			deleteDs(param) {
@@ -225,20 +200,13 @@
 				})
 			},
 			showEditModel(data) {
-				let ref = 'dsModel'
-				console.log(data)
-				if (data.typeName === 'EXCEL') {
-					ref = 'excelModal'
-				}
-				this.$refs[ref].dsParam = Object.assign({}, data)
-				this.$refs[ref].modalEdit = true
-				this.$refs[ref].modalTitle = '编辑'
-				this.$refs[ref].modalShow = true
+				this.$refs.firstModel.openForm(data.typeName, data.typeName + "Form", true, data)
 			}
 		}
 	}
 
 </script>
+
 <style scoped>
 
 </style>

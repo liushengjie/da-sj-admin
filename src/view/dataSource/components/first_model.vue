@@ -3,60 +3,61 @@
 		<Modal v-model="modelShow" :title="modelTitle" :loading="loading" width="800">
 			<Divider orientation="left">关系型数据源</Divider>
 			<ul class="WH100 disRow">
-				<li v-for="newlyBuild in relationData" @click="newlyBuildType(newlyBuild.name,newlyBuild.numbers)">
+				<li v-for="form in relationData" @click="openForm(form.name,form.page)">
 					<Card class="card" :padding=5>
 						<p slot="title">
-							{{newlyBuild.name}}
+							{{form.name}}
 						</p>
-						<img class="WH100" :src="newlyBuild.img" />
+						<img class="WH100" :src="form.img" />
 					</Card>
 				</li>
 			</ul>
 			<Divider orientation="left">非关系型数据源</Divider>
 			<ul class="WH100 disRow">
-				<li v-for="newlyBuild in noSQLData" @click="newlyBuildType(newlyBuild.name,newlyBuild.numbers)">
+				<li v-for="form in noSQLData" @click="openForm(form.name,form.page)">
 					<Card class="card" :padding=5>
 						<p slot="title">
-							{{newlyBuild.name}}
+							{{form.name}}
 						</p>
-						<img class="WH100" :src="newlyBuild.img" />
+						<img class="WH100" :src="form.img" />
 					</Card>
 				</li>
 			</ul>
 			<Divider orientation="left">大数据数据源</Divider>
 			<ul class="WH100 disRow">
-				<li v-for="newlyBuild in bigData" @click="newlyBuildType(newlyBuild.name,newlyBuild.numbers)">
+				<li v-for="form in bigData" @click="openForm(form.name,form.page)">
 					<Card class="card" :padding=5>
 						<p slot="title">
-							{{newlyBuild.name}}
+							{{form.name}}
 						</p>
-						<img class="WH100" :src="newlyBuild.img" />
+						<img class="WH100" :src="form.img" />
 					</Card>
 				</li>
 			</ul>
 			<Divider orientation="left">图数据源</Divider>
 			<ul class="WH100 disRow">
-				<li v-for="newlyBuild in graphData" @click="newlyBuildType(newlyBuild.name,newlyBuild.numbers)">
+				<li v-for="form in graphData" @click="openForm(form.name,form.page)">
 					<Card class="card" :padding=5>
 						<p slot="title">
-							{{newlyBuild.name}}
+							{{form.name}}
 						</p>
-						<img class="WH100" :src="newlyBuild.img" />
+						<img class="WH100" :src="form.img" />
 					</Card>
 				</li>
 			</ul>
 			<Divider orientation="left">流式数据源</Divider>
 			<ul class="WH100 disRow">
-				<li v-for="newlyBuild in flowData" @click="newlyBuildType(newlyBuild.name,newlyBuild.numbers)">
+				<li v-for="form in flowData" @click="openForm(form.name,form.page)">
 					<Card class="card" :padding=5>
 						<p slot="title">
-							{{newlyBuild.name}}
+							{{form.name}}
 						</p>
-						<img class="WH100" :src="newlyBuild.img" />
+						<img class="WH100" :src="form.img" />
 					</Card>
 				</li>
 			</ul>
 		</Modal>
+		<MYSQLForm ref="MYSQLForm"></MYSQLForm>
 	</div>
 </template>
 <script>
@@ -83,94 +84,97 @@
 	import png21 from '@/assets/images/icon_fileType/21.svg'
 	import png22 from '@/assets/images/icon_fileType/22.svg'
 
+	import MYSQLForm from '@/view/dataSource/components/form/mysql_form'
+
 
 	export default {
+		components: {
+			MYSQLForm,
+		},
 		data() {
 			return {
 				modelTitle: '新建',
 				modelShow: false,
 				loading: true,
-				relationData: [
-
-					{
+				relationData: [{
 						name: 'MySQL',
 						img: png2,
-						numbers: '1'
+						page: "MYSQLForm"
 					},
 					{
 						name: 'ORACLE',
 						img: png4,
-						numbers: '2'
+						page: '2'
 					},
 					{
 						name: 'SQL SERVER',
 						img: png10,
-						numbers: '2'
+						page: '2'
 					},
 					{
 						name: 'DB2',
 						img: png11,
-						numbers: '2'
+						page: '2'
 					}
 				],
 				noSQLData: [{
 						name: 'Excel',
 						img: png1,
-						numbers: '0'
+						page: '0'
 					},
 					{
 						name: 'CSV',
 						img: png15,
-						numbers: '1'
+						page: '1'
 					},
 					{
 						name: 'FTP',
 						img: png22,
-						numbers: '2'
+						page: '2'
 					},
 					{
 						name: 'MONGODB',
 						img: png9,
-						numbers: '2'
+						page: '2'
 					}
 				],
 				bigData: [{
 					name: 'HIVE',
 					img: png3,
-					numbers: '0'
+					page: '0'
 				}, {
 					name: 'SPARK',
 					img: png6,
-					numbers: '0'
+					page: '0'
 				}, {
 					name: 'IMPALA',
 					img: png8,
-					numbers: '0'
+					page: '0'
 				}],
 				graphData: [{
 					name: 'NEO4J',
 					img: png1,
-					numbers: '0'
+					page: '0'
 				}],
 				flowData: [{
 						name: 'API-RESFUL',
 						img: png21,
-						numbers: '0'
+						page: '0'
 					},
 					{
 						name: 'KAFKA',
 						img: png2,
-						numbers: '1'
+						page: '1'
 					},
 					{
 						name: 'ACTIVIMQ',
 						img: png4,
-						numbers: '2'
+						page: '2'
 					},
 					{
 						name: 'RABBITMQ',
 						img: png4,
-						numbers: '2'
+						page: '2'
 					}
 				],
 
@@ -180,22 +184,22 @@
 			const _this = this
 		},
 		methods: {
-			newlyBuildType: function (name, num) {
-				const _this = this
-				let arr = {
-					name: '新建' + name,
-					swi: true,
-					num: num
+			openForm: function (name, page, isEdit, dsParam) {
+				if (isEdit) {
+					eval("this.$refs." + page).modalEdit = true
+					eval("this.$refs." + page).dsParam = Object.assign({}, dsParam)
+					eval("this.$refs." + page).modalTitle = '编辑'
+				}else{
+					this.modelShow = false
 				}
-				_this.$emit('NewBuild', arr)
-				this.modelShow = false
+				eval("this.$refs." + page).modalShow = true
 			}
 		}
 	}
 
 </script>
 <style>
-	.disRow > li {
+	.disRow>li {
 		list-style: none;
 		margin-left: 20px;
 		margin-right: 60px;
