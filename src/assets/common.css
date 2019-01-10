@@ -1,0 +1,42 @@
+/* 设置滚动条的样式 */
+.ele-scroll ::-webkit-scrollbar,
+.ele-scroll::-webkit-scrollbar {
+    width:5px;
+    height:8px;
+}
+/* 滚动条滑块 */
+.ele-scroll ::-webkit-scrollbar-thumb,
+.ele-scroll::-webkit-scrollbar-thumb {
+    border-radius: 50px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.form-item {
+    line-height: 40px;
+    text-align: center;
+    font-size: 13px;
+}
+.form-input {
+    line-height: 40px;
+}
+.vertical-center-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.vertical-center-modal .ivu-modal {
+    top: 0;
+}
+.ivu-form-item {
+    /*margin-bottom:15px;*/
+}
+.tabs {
+    padding-left: 20px;
+    width: 180px;
+}
+.preview-table .ivu-table-cell {
+    white-space: nowrap;
+}
+.preview-table table {
+    min-width: 100%;
+}
