@@ -177,8 +177,7 @@
 			},
 			// 弹出新建弹窗
 			showNewModel() {
-				this.$refs.firstModel.modelTitle = '新增'
-				this.$refs.firstModel.modelShow = true
+				this.$refs.firstModel.show(this.typeList)
 			},
 			// 删除数据源
 			deleteDs(param) {

@@ -15,9 +15,10 @@ export const getDsType = () => {
   })
 }
 
-export const insertDs = (data) => {
+export const insertDs = (param, data) => {
   return axios.request({
-    url: 'dataSource/insertDs',
+	url: 'dataSource/insertDs',
+	params: param,
     data,
     method: 'post'
   })

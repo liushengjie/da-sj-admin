@@ -3,7 +3,7 @@
 		<Modal v-model="modelShow" :title="modelTitle" :loading="loading" width="800">
 			<Divider orientation="left">关系型数据源</Divider>
 			<ul class="WH100 disRow">
-				<li v-for="form in relationData" @click="openForm(form.name,form.page)">
+				<li v-for="form in relationData" @click="openForm(form.name,form.page,form.code)">
 					<Card class="card" :padding=5>
 						<p slot="title">
 							{{form.name}}
@@ -14,7 +14,7 @@
 			</ul>
 			<Divider orientation="left">非关系型数据源</Divider>
 			<ul class="WH100 disRow">
-				<li v-for="form in noSQLData" @click="openForm(form.name,form.page)">
+				<li v-for="form in noSQLData" @click="openForm(form.name,form.page,form.code)">
 					<Card class="card" :padding=5>
 						<p slot="title">
 							{{form.name}}
@@ -25,7 +25,7 @@
 			</ul>
 			<Divider orientation="left">大数据数据源</Divider>
 			<ul class="WH100 disRow">
-				<li v-for="form in bigData" @click="openForm(form.name,form.page)">
+				<li v-for="form in bigData" @click="openForm(form.name,form.page,form.code)">
 					<Card class="card" :padding=5>
 						<p slot="title">
 							{{form.name}}
@@ -36,7 +36,7 @@
 			</ul>
 			<Divider orientation="left">图数据源</Divider>
 			<ul class="WH100 disRow">
-				<li v-for="form in graphData" @click="openForm(form.name,form.page)">
+				<li v-for="form in graphData" @click="openForm(form.name,form.page,form.code)">
 					<Card class="card" :padding=5>
 						<p slot="title">
 							{{form.name}}
@@ -47,7 +47,18 @@
 			</ul>
 			<Divider orientation="left">流式数据源</Divider>
 			<ul class="WH100 disRow">
-				<li v-for="form in flowData" @click="openForm(form.name,form.page)">
+				<li v-for="form in flowData" @click="openForm(form.name,form.page,form.code)">
+					<Card class="card" :padding=5>
+						<p slot="title">
+							{{form.name}}
+						</p>
+						<img class="WH100" :src="form.img" />
+					</Card>
+				</li>
+			</ul>
+			<Divider orientation="left">数据源</Divider>
+			<ul class="WH100 disRow">
+				<li v-for="form in defaultData" @click="openForm(form.name,form.page,form.code)">
 					<Card class="card" :padding=5>
 						<p slot="title">
 							{{form.name}}
@@ -61,28 +72,6 @@
 	</div>
 </template>
 <script>
-	import png1 from '@/assets/images/icon_fileType/1.svg'
-	import png2 from '@/assets/images/icon_fileType/2.svg'
-	import png3 from '@/assets/images/icon_fileType/3.svg'
-	import png4 from '@/assets/images/icon_fileType/4.svg'
-	import png5 from '@/assets/images/icon_fileType/5.svg'
-	import png6 from '@/assets/images/icon_fileType/6.svg'
-	import png7 from '@/assets/images/icon_fileType/7.svg'
-	import png8 from '@/assets/images/icon_fileType/8.svg'
-	import png9 from '@/assets/images/icon_fileType/9.svg'
-	import png10 from '@/assets/images/icon_fileType/10.svg'
-	import png11 from '@/assets/images/icon_fileType/11.svg'
-	import png12 from '@/assets/images/icon_fileType/12.svg'
-	import png13 from '@/assets/images/icon_fileType/13.svg'
-	import png14 from '@/assets/images/icon_fileType/14.svg'
-	import png15 from '@/assets/images/icon_fileType/15.svg'
-	import png16 from '@/assets/images/icon_fileType/16.svg'
-	import png17 from '@/assets/images/icon_fileType/17.svg'
-	import png18 from '@/assets/images/icon_fileType/18.svg'
-	import png19 from '@/assets/images/icon_fileType/19.svg'
-	import png20 from '@/assets/images/icon_fileType/20.svg'
-	import png21 from '@/assets/images/icon_fileType/21.svg'
-	import png22 from '@/assets/images/icon_fileType/22.svg'
 
 	import MYSQLForm from '@/view/dataSource/components/form/mysql_form'
 
@@ -96,95 +85,53 @@
 				modelTitle: '新建',
 				modelShow: false,
 				loading: true,
-				relationData: [{
-						name: 'MySQL',
-						img: png2,
-						page: "MYSQLForm"
-					},
-					{
-						name: 'ORACLE',
-						img: png4,
-						page: 'ORACLEForm'
-					},
-					{
-						name: 'SQL SERVER',
-						img: png10,
-						page: '2'
-					},
-					{
-						name: 'DB2',
-						img: png11,
-						page: '2'
-					}
-				],
-				noSQLData: [{
-						name: 'Excel',
-						img: png1,
-						page: 'EXCELForm'
-					},
-					{
-						name: 'CSV',
-						img: png15,
-						page: '1'
-					},
-					{
-						name: 'FTP',
-						img: png22,
-						page: '2'
-					},
-					{
-						name: 'MONGODB',
-						img: png9,
-						page: '2'
-					}
-				],
-				bigData: [{
-					name: 'HIVE',
-					img: png3,
-					page: '0'
-				}, {
-					name: 'SPARK',
-					img: png6,
-					page: '0'
-				}, {
-					name: 'IMPALA',
-					img: png8,
-					page: '0'
-				}],
-				graphData: [{
-					name: 'NEO4J',
-					img: png1,
-					page: '0'
-				}],
-				flowData: [{
-						name: 'API-RESFUL',
-						img: png21,
-						page: '0'
-					},
-					{
-						name: 'KAFKA',
-						img: png2,
-						page: '1'
-					},
-					{
-						name: 'ACTIVIMQ',
-						img: png4,
-						page: '2'
-					},
-					{
-						name: 'RABBITMQ',
-						img: png4,
-						page: '2'
-					}
-				],
-
+				relationData: [],
+				noSQLData: [],
+				graphData:[],
+				bigData: [],
+				flowData: [],
+				defaultData:[],
 			}
 		},
 		mounted() {
 			const _this = this
+
 		},
 		methods: {
-			openForm: function (name, page, isEdit, dsParam) {
+			show: function (dataSourceList) {
+				this.reset();
+				dataSourceList.forEach(d => {
+					try {
+						d.img = require('@/assets/images/icon_fileType/'+d.name+'.svg')
+					}
+					catch(err){
+						d.img = require('@/assets/images/icon_fileType/default.svg')
+					}
+
+					d.page = d.name + "Form"
+					if(d.cat == 'relationData'){
+						this.relationData.push(d)
+					}else if(d.cat == 'noSQLData'){
+						this.noSQLData.push(d)
+					}else if(d.cat == 'graphData'){
+						this.graphData.push(d)
+					}else if(d.cat == 'bigData'){
+						this.bigData.push(d)
+					}else if(d.cat == 'flowData'){
+						this.flowData.push(d)
+					}else{
+						this.defaultData.push(d)
+					}
+				})
+				this.modelTitle = '新增'
+				this.modelShow = true
+			},
+			openForm: function (name, page, typeCode, isEdit, dsParam) {
+				if(typeCode){
+					console.log("请检查datasource的typeCode类型！！！！")
+					return
+				}
+				eval("this.$refs." + page).datasourceType = typeCode
 				if (isEdit) {
 					eval("this.$refs." + page).modalEdit = true
 					eval("this.$refs." + page).dsParam = Object.assign({}, dsParam)
@@ -193,6 +140,14 @@
 					this.modelShow = false
 				}
 				eval("this.$refs." + page).modalShow = true
+			},
+			reset: function(){
+				this.relationData = [];
+				this.noSQLData = [];
+				this.graphData = [];
+				this.bigData = [];
+				this.flowData = [];
+				this.defaultData = [];
 			}
 		}
 	}
