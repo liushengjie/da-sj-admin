@@ -104,7 +104,7 @@
 					{
 						name: 'ORACLE',
 						img: png4,
-						page: '2'
+						page: 'ORACLEForm'
 					},
 					{
 						name: 'SQL SERVER',
@@ -120,7 +120,7 @@
 				noSQLData: [{
 						name: 'Excel',
 						img: png1,
-						page: '0'
+						page: 'EXCELForm'
 					},
 					{
 						name: 'CSV',
