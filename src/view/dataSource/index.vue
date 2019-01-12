@@ -199,7 +199,7 @@
 				})
 			},
 			showEditModel(data) {
-				this.$refs.firstModel.openForm(data.typeName, data.typeName + "Form", true, data)
+				this.$refs.firstModel.openForm(data.typeName, data.typeName + "Form", data.type, true, data)
 			}
 		}
 	}

@@ -40,9 +40,10 @@ export const deleteDs = (param) => {
   })
 }
 
-export const testConn = (data) => {
+export const testConn = (param, data) => {
   return axios.request({
-    url: 'dataSource/connectDs',
+	url: 'dataSource/connectDs',
+	params: param,
     data,
     method: 'post'
   })

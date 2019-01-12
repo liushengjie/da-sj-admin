@@ -1,6 +1,6 @@
 <template>
 <div>
-    <Modal :loading="true" :title="modalTitle" v-model="modalShow" :mask-closable="false" @on-cancel="closeNewDiag">
+    <Modal :loading="true" :title="modalTitle" v-model="modalShow" :mask-closable="false" @on-cancel="close">
         <Form ref="dataForm" :model="submitParam" :labelWidth="90" :rules="ruleValidate">
             <FormItem label="源名称" prop="name">
                 <Input placeholder="连接名称" v-model="submitParam.name"></Input>
@@ -30,7 +30,7 @@
         </Form>
         <div slot="footer">
             <Button style="float:left" @click="testConn" :loading="loading">测试连接</Button>
-            <Button @click="closeNewDiag" type="default">取消</Button>
+            <Button @click="close" type="default">取消</Button>
             <Button @click="submitForm" type="primary">确定</Button>
         </div>
         <Spin size="large" fix v-if="spinShow"></Spin>
@@ -94,7 +94,6 @@ export default {
                 // 提交前先进行表单验证
                 if (valid) {
                     this.spinShow = true
-
                     this.connect(ret => {
                         if (ret) {
                             if (!this.modalEdit) {
@@ -136,7 +135,7 @@ export default {
             })
         },
         connect(cb) {
-            dbApi.testConn(this.submitParam).then(res => {
+            dbApi.testConn({'type':this.datasourceType},this.submitParam).then(res => {
                 if (res.success) {
                     cb(true)
                 } else {
@@ -166,7 +165,7 @@ export default {
                 }
             })
         },
-        closeNewDiag() {
+        close() {
             this.modalShow = false
             this.resetForm()
         },

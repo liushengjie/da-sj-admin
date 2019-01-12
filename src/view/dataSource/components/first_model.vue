@@ -126,20 +126,27 @@
 				this.modelTitle = '新增'
 				this.modelShow = true
 			},
-			openForm: function (name, page, typeCode, isEdit, dsParam) {
-				if(typeCode){
-					console.log("请检查datasource的typeCode类型！！！！")
-					return
+			openForm: function (name, page, typeCode, isEdit, submitParam) {
+				try {
+					if(typeCode){
+						console.log("请检查datasource的typeCode类型！！！！")
+					}
+					eval("this.$refs." + page).datasourceType = typeCode
+					if (isEdit) {
+						eval("this.$refs." + page).modalEdit = true
+						eval("this.$refs." + page).submitParam = Object.assign({}, submitParam)
+						eval("this.$refs." + page).modalTitle = '编辑'
+					}else{
+						this.modelShow = false
+					}
+					eval("this.$refs." + page).modalShow = true
+				}catch (err){
+					this.$Message.error({
+						content: '无法找到表单信息，请检查配置',
+						duration: 3
+					})
 				}
-				eval("this.$refs." + page).datasourceType = typeCode
-				if (isEdit) {
-					eval("this.$refs." + page).modalEdit = true
-					eval("this.$refs." + page).dsParam = Object.assign({}, dsParam)
-					eval("this.$refs." + page).modalTitle = '编辑'
-				}else{
-					this.modelShow = false
-				}
-				eval("this.$refs." + page).modalShow = true
+
 			},
 			reset: function(){
 				this.relationData = [];
