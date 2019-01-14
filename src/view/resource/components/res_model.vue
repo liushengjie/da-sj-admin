@@ -38,7 +38,7 @@
 							</Cell>
 						</CellGroup>
 						</Col>
-						<Divider dashed class="divider" v-show="show_diy_sql_btn" />
+						<!--<Divider dashed class="divider" v-show="show_diy_sql_btn" />
 						<Col span="24" size="small" v-show="show_diy_sql_btn">
 						<CellGroup>
 							<Cell title="SQL" label="新自定义SQL" class="draggable">
@@ -46,6 +46,7 @@
 							</Cell>
 						</CellGroup>
 						</Col>
+						-->
 					</Row>
 				</div>
 				<div slot="right" style="height:100%;">
@@ -619,7 +620,8 @@
 	}
 
 	.result-row {
-		height: calc(100% - 58px);
+		#height: calc(100% - 58px);
+		height:100%;
 	}
 
 	.col-row {
@@ -666,7 +668,7 @@
 	}
 
 	.col-list .ivu-cell-icon {
-		width: 50px;
+		width: 65px;
 	}
 
 	.res-modal .ivu-modal-header {
