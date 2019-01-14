@@ -166,7 +166,7 @@
 				this.curTableData = tableData
 				const param = {
 					dataSource: dsId,
-					tableName: tableData.TABLE_NAME
+					tableName: tableData.tableName
 				}
 				dbApi.getTableColumns(param).then(res => {
 					if (res.success) {
@@ -179,7 +179,7 @@
 				let param = {
 					type: '2',
 					datasource: this.curDsId,
-					tablename: this.curTableData.TABLE_NAME,
+					tablename: this.curTableData.tableName,
 					alias: data.alias || '',
 					remark: data.remark || '',
 					colname: data.col
