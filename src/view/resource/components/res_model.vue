@@ -71,7 +71,7 @@
 							</Row>
 							<Row style="padding-top:5px">
 								<Spin size="large" fix v-if="dataloadingShow"></Spin>
-								<Table class="ele-scroll preview-table" :columns="columns" :data="previewData" :height="tableHeight"></Table>
+								<Table class="ele-scroll preview-table" :columns="previewCols" :data="previewData" :height="tableHeight"></Table>
 							</Row>
 						</div>
 					</Split>
@@ -102,25 +102,11 @@
 					id: [],
 					name: []
 				},
-				showHideCol: false,
 				showLines: 50,
 				split1: 0.15,
 				split2: 0.2,
-				show_diy_sql_btn: false,
-				colTypeIcon: {
-					date: require('@/assets/images/col-type/date.png'),
-					varchar: require('@/assets/images/col-type/varchar.png'),
-					datetime: require('@/assets/images/col-type/datetime.png'),
-					float: require('@/assets/images/col-type/float.png'),
-					int: require('@/assets/images/col-type/int.png'),
-					index: require('@/assets/images/col-type/index.png'),
-					pk: require('@/assets/images/col-type/pk.png')
-				},
-				columns: [{
-					title: ''
-				}],
 				categoryList: [],
-				previewData: [],
+
 				renameTitle: '',
 				curEditColIndex: 0,
 				resource:{}, //// 资源对象
@@ -135,6 +121,8 @@
 				tableHeight: document.body.clientHeight - 189,
 				res_model: false,
 				colRenameModal: false,
+				previewCols:[],
+				previewData: [],
 			}
 		},
 		mounted() {
@@ -259,7 +247,6 @@
 					this.tables_data = []
 					this.show_diy_sql_btn = false
 					this.showLines = 50
-					this.showHideCol = false
 					this.$store.state.resource.res.connectType = '0'
 					this.curCategory = {
 						id: [],

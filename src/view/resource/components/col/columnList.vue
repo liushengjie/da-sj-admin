@@ -28,7 +28,8 @@
 							<Icon type="ios-arrow-down"></Icon>
 						</a>
 						<DropdownMenu slot="list" v-show="item.status==='1'">
-							<DropdownItem name="addIndex">置为索引</DropdownItem>
+							<DropdownItem name="addIndex" v-show="item.idx==0">置为索引</DropdownItem>
+							<DropdownItem name="removeIndex" v-show="item.idx==1">取消索引</DropdownItem>
 							<DropdownItem name="rename">重命名</DropdownItem>
 							<Dropdown name="changeType" placement="right-start" trigger="click" @on-click="showMenuModal($event, item)">
 								<DropdownItem>
@@ -43,7 +44,7 @@
 									<DropdownItem name="changeType-datetime" v-show="item.changeType!=='datetime'">日期时间</DropdownItem>
 								</DropdownMenu>
 							</Dropdown>
-							<DropdownItem name="dic"> 数据字典</DropdownItem>
+							<DropdownItem name="dict"> 数据字典</DropdownItem>
 							<DropdownItem v-if="item.changeType==='varchar'||!item.changeType" name="split"> 拆分</DropdownItem>
 							<DropdownItem name="hide"> 隐藏</DropdownItem>
 						</DropdownMenu>
@@ -62,9 +63,9 @@
 	</div>
 </template>
 <script>
-	import split from '@/view/resource/components/split'
+	import split from '@/view/resource/components/col/split'
 	import columnFilter from '@/view/resource/components/columnFilter'
-	import dictList from '@/view/resource/components/dictList'
+	import dictList from '@/view/resource/components/col/dictList'
 	import * as resApi from '@/api/resource'
 	export default {
 		components: {
@@ -104,16 +105,16 @@
 					}
 				} else if (e === 'addIndex') {
 					item.idx = '1'
+				}else if (e === 'removeIndex') {
+					item.idx = '0'
 				} else if (e === 'hide') {
 					item.status = '0'
-					this.renderColList()
-				} else if (e === 'dic') {
+				} else if (e === 'dict') {
 					this.$refs.dictList.getDictList()
 				} else if (e.includes('changeType-')) {
 					item.changeType = e.split('-')[1]
 				} else if (e === 'show') {
 					item.status = '1'
-					this.renderColList()
 				}
 			},
 			addSplit(proc) {
@@ -134,10 +135,6 @@
 					status: '1',
 					proc: [proc]
 				})
-				this.renderColList()
-			},
-			renderColList() {
-				this.$emit('renderColList', true)
 			},
 			showColList() {
 				this.$refs.colList.colListShow = true
