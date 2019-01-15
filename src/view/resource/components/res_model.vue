@@ -296,7 +296,6 @@
 			renderColList(isSplit) {
 				this.columns = []
 				if (!isSplit) {
-					//                this.$store.state.resource.resColList = [];
 					this.$store.state.resource.resFilterList = []
 				}
 				this.$store.state.resource.resColList.forEach(item => {
