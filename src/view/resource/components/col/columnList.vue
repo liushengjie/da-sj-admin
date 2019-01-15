@@ -1,20 +1,23 @@
 <template>
 	<div class="op-area">
 		<Row>
-			<Col span="12" size="small">
+			<Col span="6" size="small">
 			<font size="3.5" style="padding-left:5px">字段</font>
 			</Col>
-			<Col span="12" size="small" style="text-align: right;padding-top:3px">
+			<Col span="12" size="small">
+			<Checkbox v-model="showHideCol" style="padding-top:3px;">显示隐藏字段</Checkbox>
+			</Col>
+			<Col span="6" size="small" style="text-align: right;padding-top:3px">
 			<a href="javascript:void(0)" @click="showColList">清洗器({{$store.getters.procCount||0}})</a>
 			</Col>
 		</Row>
 
 		<Row class="col-row ele-scroll">
 			<Spin size="large" fix v-if="colloadingShow"></Spin>
-			<Checkbox v-model="showHideCol">显示隐藏字段</Checkbox>
+
 			<Col span="24" size="small" class="form-input col-list">
 			<CellGroup>
-				<Cell class="col-list" v-show="item.status==='1'||showHideCol" :disabled="item.status==='0'" v-for="(item, index) in $store.state.resource.resColList"
+				<Cell class="col-list" v-show="item.status==='1'||showHideCol" :disabled="item.status==='0'" v-for="(item, index) in columnDatas"
 				 :title="item.col" :label="item.alias">
 					<img class="col-type-icon" :src="colTypeIcon[item.changeType]" slot="icon">
 					<img class="col-type-icon" :src="colTypeIcon.varchar" v-show="!item.changeType" slot="icon">
@@ -53,7 +56,7 @@
 			</Col>
 		</Row>
 		<split @addSplit="addSplit" :dsType="curDsType" :colName="curSplitName" ref="split"></split>
-		<columnFilter :previewData="previewData" @renderColList="renderColList" :dsType="curDsType" :colList="$store.state.resource.resColList"
+		<columnFilter :previewData="previewData" @renderColList="renderColList" :dsType="curDsType" :colList="columnDatas"
 		 ref="colList"></columnFilter>
 		<dictList ref="dictList" :curSplitName="curSplitName"></dictList>
 	</div>
@@ -69,7 +72,7 @@
 			columnFilter,
 			dictList
 		},
-		props: ['curDsType', 'previewData'],
+		props: ['curDsType', 'previewData', 'columnDatas'],
 		data() {
 			return {
 				colloadingShow: false,
@@ -112,7 +115,6 @@
 					item.status = '1'
 					this.renderColList()
 				}
-				console.log(this.$store.state.resource.resColList)
 			},
 			addSplit(proc) {
 				let originCol = this.$store.state.resource.resColList[this.curSplitIndex].originCol || this.curSplitName
@@ -132,7 +134,6 @@
 					status: '1',
 					proc: [proc]
 				})
-				console.log(JSON.stringify(this.$store.state.resource))
 				this.renderColList()
 			},
 			renderColList() {

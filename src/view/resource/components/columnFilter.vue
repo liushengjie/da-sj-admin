@@ -29,7 +29,7 @@
 	import equalsFilter from '@/view/resource/components/filterComponents/equalsFilter'
 	import vis from 'vis'
 	import * as procApi from '@/api/processor'
-	import * as dragUtils from '@/view/resource/components/dragUtils'
+	import * as dragUtils from '@/libs/dragUtils'
 	export default {
 		components: {
 			dateFilter,

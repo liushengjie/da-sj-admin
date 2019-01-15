@@ -58,7 +58,7 @@
                                     </Card>
                                 </div>
                             </Split>
-                            
+
                         </div>
                     </Split>
                 </div>
@@ -69,7 +69,7 @@
 <script>
     import visNetwork from './visNetwork'
     import * as serApi from '@/api/service'
-    import * as dragUtils from '@/view/resource/components/dragUtils'
+    import * as dragUtils from '@/libs/dragUtils'
 
     export default {
         components: {

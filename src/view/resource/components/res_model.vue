@@ -32,21 +32,12 @@
 						</Col>
 						<Col span="24" class="form-input table-list ele-scroll" size="small">
 						<CellGroup>
-							<Cell v-for="item in tables_data" :data-id="item.alias_id" :title="item.alias || item.tableName" :label="item.tableName"
+							<Cell v-for="item in tables_data" :data-table="JSON.stringify(item)" :title="item.alias || item.tableName" :label="item.tableName"
 							 class="draggable">
 								<Icon type="md-grid" slot="icon" />
 							</Cell>
 						</CellGroup>
 						</Col>
-						<!--<Divider dashed class="divider" v-show="show_diy_sql_btn" />
-						<Col span="24" size="small" v-show="show_diy_sql_btn">
-						<CellGroup>
-							<Cell title="SQL" label="新自定义SQL" class="draggable">
-								<Icon type="ios-apps-outline" slot="icon" />
-							</Cell>
-						</CellGroup>
-						</Col>
-						-->
 					</Row>
 				</div>
 				<div slot="right" style="height:100%;">
@@ -60,15 +51,14 @@
 									</div>
 								</div>
 								<div class="drop-area-edit">
-									<RadioGroup v-model="$store.state.resource.res.connectType">
+									<RadioGroup v-model="connectType">
 										<Radio label="0">实时</Radio>
 										<Radio label="1">数据提取</Radio>
 									</RadioGroup>
-									<a href="javascript:void(0)" v-show="$store.state.resource.res.connectType==1" @click="openExtractSetting">编辑</a>
+									<a href="javascript:void(0)" v-show="connectType==1" @click="openConnSetting">编辑</a>
 								</div>
 							</div>
-							<colList @getPreviewData="getPreviewData" @renderColList="renderColList" :previewData="previewData" :curDsType="curDsType"
-							 ref="colList"></colList>
+							<colList ref="colList" :columnDatas="columnDatas"></colList>
 						</div>
 						<div slot="right" class="split-pane">
 							<Row>
@@ -76,7 +66,6 @@
 								<font size="3.5" style="padding-left:5px">数据预览</font>
 								</Col>
 								<Col span="12" size="small" style="text-align: right">
-								<!--<Checkbox v-model="showHideCol">显示隐藏字段</Checkbox>-->
 								<Input v-model="showLines" suffix="ios-search" style="width: 140px" size="small" />行
 								</Col>
 							</Row>
@@ -89,54 +78,30 @@
 				</div>
 			</Split>
 		</div>
-		<Modal v-model="sqlModel" title="请输入SQL语句">
-			<Input type="textarea" width="100%" :rows="4" v-model="$store.state.resource.resData.diySql"></Input>
-			<div slot="footer">
-				<Button style="float:left" @click="getPreviewDataBySql" :loading="loading">数据预览</Button>
-				<Button @click="closeSQLDiag" type="default">取消</Button>
-				<Button @click="getColsBySql" type="primary">确定</Button>
-			</div>
-		</Modal>
 		<Modal title="重命名" v-model="colRenameModal" on-ok="rename">
 			<Input v-model="renameTitle"></Input>
 		</Modal>
-		<preview ref="preview" @dataNumber="getPreviewDataBySql"></preview>
-		<extract ref="extract"></extract>
+		<conn-setting ref="connSetting"></conn-setting>
 	</Modal>
 </template>
 <script>
-	import * as dragUtils from '@/view/resource/components/dragUtils'
+	import * as dragUtils from '@/libs/dragUtils'
 	import * as dbApi from '@/api/dataSource'
 	import * as resApi from '@/api/resource'
-	import extract from '@/view/resource/components/extractSetting'
-	import colList from '@/view/resource/components/columnList'
-	import preview from '@/components/table/commonTable'
+	import connSetting from '@/view/resource/components/modals/connSetting'
+	import colList from '@/view/resource/components/col/columnList'
 	import deleteIcon from '@/assets/images/u4511.png'
 	export default {
 		components: {
-			preview,
-			extract,
+			connSetting,
 			colList
 		},
 		data() {
 			return {
-				tableloadingShow: false,
-				dataloadingShow: false,
-				loading: false,
-				modalLoading: true,
 				curCategory: {
 					id: [],
 					name: []
 				},
-				curDs: '',
-				curDsType: '',
-				dsList: [],
-				single: true,
-				tables_data: [],
-				tableHeight: document.body.clientHeight - 189,
-				res_model: false,
-				sqlModel: false,
-				colRenameModal: false,
 				showHideCol: false,
 				showLines: 50,
 				split1: 0.15,
@@ -156,8 +121,20 @@
 				}],
 				categoryList: [],
 				previewData: [],
-				renameTitle: '', // 重命名值
-				curEditColIndex: 0 // 当前重命名列的索引值
+				renameTitle: '',
+				curEditColIndex: 0,
+				resource:{}, //// 资源对象
+				connectType:'0', //// 连接方式
+				columnDatas:[], // 列数据信息
+				tableloadingShow: false, //左侧tablelist loading
+				dataloadingShow: false,  //右侧数据预览 loading
+				modalLoading: true,
+				curDs: '', //当前数据源id
+				dsList: [], //数据源列表
+				tables_data: [], //数据表列表
+				tableHeight: document.body.clientHeight - 189,
+				res_model: false,
+				colRenameModal: false,
 			}
 		},
 		mounted() {
@@ -182,19 +159,12 @@
 					return false
 				}
 				this.tableloadingShow = true
-				this.$store.state.resource.resData.dsId = id
-				this.dsList.forEach(item => {
-					if (item.id === id) {
-						this.curDsType = item.type
-					}
-				})
 				dbApi.getTables({
 					dataSource: id
 				}).then(res => {
 					this.tableloadingShow = false
 					if (res.success) {
 						this.tables_data = res.data
-						this.show_diy_sql_btn = type !== '3'
 						this.$nextTick(() => {
 							dragUtils.setDragAndDrop(
 								'.draggable',
@@ -202,11 +172,22 @@
 								'drop-highlight',
 								dom => {
 									this.renderDropDiv(dom.find('.ivu-cell-title').text())
-									this.getCols(
-										dom.find('.ivu-cell-label').text(), dom.data('id')
-									)
+									this.getResourceObj(id, dom.data('table'))
 								}
 							)
+						})
+					}
+				})
+			},
+			getResourceObj(datasourceId, table){
+				resApi.loadResObj({'datasourceId':datasourceId},table).then(res => {
+					if(res.success) {
+						this.resource = res.data
+						this.getCols(this.resource)
+					}else{
+						this.$Message.error({
+							content: '获取资源对象失败',
+							duration: 3
 						})
 					}
 				})
@@ -220,109 +201,22 @@
 					'</div>'
 				$('.dropDiv').html(html).removeClass('drop-highlight')
 				$('.del-icon').unbind().click(() => {
-					_this.initData()
+					//_this.initData()
 				})
 			},
 			// 获取列内容列表
-			getCols(tableName, aliasId) {
-				this.$store.state.resource.resColList = []
-				this.columns = []
-				this.previewData = []
-				if (tableName === '新自定义SQL') {
-					this.sqlModel = true
-					this.$store.state.resource.resData.tableName = ''
-					this.$store.state.resource.resData.diy = '1'
-					this.$store.state.resource.resData.diySql = ''
-				} else {
-					this.$refs.colList.colloadingShow = true
-					const param = {
-						dataSource: this.$store.state.resource.resData.dsId,
-						tableName: tableName
+			getCols(resource) {
+				this.$refs.colList.colloadingShow = true
+				resApi.loadResCols(resource).then(res => {
+					this.$refs.colList.colloadingShow = false
+					if (res.success) {
+						this.columnDatas = res.data
+					} else {
+						this.$refs.colList.colloadingShow = false
 					}
-					this.$store.state.resource.resData.tableName = tableName
-					this.$store.state.resource.resData.aliasId = aliasId
-					this.$store.state.resource.resData.diy = '0'
-					dbApi.getTableColumns(param).then(res => {
-						this.$refs.colList.colloadingShow = false
-						if (res.success) {
-							const obj = {
-								'id': '',
-								'dic': '',
-								'resId': '',
-								'name': '',
-								'type': '',
-								'changeType': '',
-								'attr': '0',
-								'col': '',
-								'pk': '0',
-								'idx': '0',
-								'proc': [],
-								'colCache': '',
-								'status': '1'
-							}
-							res.data.forEach((res, index) => {
-								this.$store.state.resource.resColList.push($.extend({}, obj, res))
-								this.$store.state.resource.resColList[index].colCache = this.$store.state.resource.resColList[index].col
-							})
-							console.log(this.$store.state.resource.resColList)
-							this.renderColList()
-						} else {
-							this.$refs.colList.colloadingShow = false
-						}
-					}).catch(e => {
-						this.$refs.colList.colloadingShow = false
-					})
-				}
-			},
-			getColsBySql() {
-				this.sqlModel = false
-				if (this.$store.state.resource.resData.diySql) {
-					this.$refs.colList.colloadingShow = true
-					dbApi.findColsBySQL({
-						dataSource: this.$store.state.resource.resData.dsId,
-						SQL: this.$store.state.resource.resData.diySql
-					}).then(res => {
-						this.$refs.colList.colloadingShow = false
-						if (res.success) {
-							this.$store.state.resource.resColList = res.data
-							this.renderColList()
-						}
-					}).catch(e => {
-						this.$refs.colList.colloadingShow = false
-					})
-				}
-			},
-			// 获取预览数据表头
-			renderColList(isSplit) {
-				this.columns = []
-				if (!isSplit) {
-					this.$store.state.resource.resFilterList = []
-				}
-				this.$store.state.resource.resColList.forEach(item => {
-					if (item.status === '1') {
-						this.columns.push({
-							title: item.alias || item.col,
-							key: item.col.toLowerCase(),
-							tooltip: true,
-							minWidth: 100,
-							renderHeader: (h, params) => {
-								return h('div', [
-									h('img', {
-										attrs: {
-											src: item.changeType ? this.colTypeIcon[item.changeType] : this.colTypeIcon['varchar']
-										},
-										style: {
-											width: '14px'
-										},
-										class: 'col-type-icon'
-									}),
-									h('div', item.alias || item.col)
-								])
-							}
-						})
-					}
+				}).catch(e => {
+					this.$refs.colList.colloadingShow = false
 				})
-				this.getPreviewData()
 			},
 			// 获取预览数据内容
 			getPreviewData() {
@@ -342,43 +236,6 @@
 					this.curEditColIndex
 				].name = this.renameTitle
 			},
-			getPreviewDataBySql(refreshNum) {
-				if (this.$store.state.resource.resData.diySql || refreshNum) {
-					this.sqlModel = false
-					this.$refs.preview.modelShow = true
-					if (typeof refreshNum === 'object') {
-						dbApi.findColsBySQL({
-							dataSource: this.$store.state.resource.resData.dsId,
-							SQL: this.$store.state.resource.resData.diySql
-						}).then(res => {
-							if (res.success) {
-								res.data.forEach(item => {
-									this.$refs.preview.tableColumns.tableCol.push({
-										title: item.alias || item.column_name,
-										key: item.column_name,
-										tooltip: true,
-										minWidth: 100
-									})
-								})
-							}
-						})
-					}
-					dbApi.preloadSQLData({
-						dataSource: this.$store.state.resource.resData.dsId,
-						sql: this.$store.state.resource.resData.diySql,
-						limit: (typeof refreshNum) === 'object' ? 50 : refreshNum
-					}).then(res => {
-						if (res.success) {
-							this.$refs.preview.tableColumns.tableData = res.data
-						}
-					})
-				}
-			},
-			closeSQLDiag() {
-				this.sqlModel = false
-				this.$store.state.resource.resData.diySql = ''
-				this.initData()
-			},
 			// 回显数据
 			reviewData() {
 				this.getTableList(this.$store.state.resource.resData.dsId)
@@ -392,39 +249,8 @@
 			},
 			// 关闭SQL窗口并初始化相关数据
 			initData() {
-				this.columns = []
-				this.previewData = []
-				this.curDs = ''
 				$('.category').find('input').val('')
 				$('.dropDiv').empty()
-				this.$store.state.resource = {
-					'res': {
-						'id': '',
-						'name': '默认资源名称',
-						'category': '',
-						'categoryList': '',
-						'connectType': '0',
-						'cacheTable': '',
-						'num': 0,
-						'createUser': '',
-						'createTime': '',
-						'status': '0',
-						'updateTime': '',
-						'schemaFlag': ''
-					},
-					'resData': {
-						'id': '',
-						'resId': '',
-						'dsId': '',
-						'tableName': '',
-						'aliasId': '',
-						'diy': '',
-						'diySql': '',
-						'createTime': ''
-					},
-					'resColList': [],
-					'resFilterList': []
-				}
 			},
 			// 关闭窗口并初始化数据
 			closeModal() {
@@ -469,10 +295,9 @@
 			},
 			changeCategory(val, selectData) {
 				this.$store.state.resource.res.category = val[val.length - 1]
-				//            this.$store.state.resource.res.name = selectData[selectData.length-1].title;
 			},
-			openExtractSetting() {
-				this.$refs.extract.modalShow = true
+			openConnSetting() {
+				this.$refs.connSetting.modalShow = true
 			},
 			save() {
 				if (!this.$store.state.resource.res.category) {
@@ -496,9 +321,6 @@
 						})
 					}
 				})
-			},
-			showSplit() {
-				this.$refs.split.modalShow = true
 			}
 		},
 		watch: {
@@ -510,34 +332,8 @@
 					}
 					if (this.curCategory.id.length) {
 						this.$store.state.resource.res.category = this.curCategory.id[this.curCategory.id.length - 1]
-						//                    this.$store.state.resource.res.name = this.curCategory.name[this.curCategory.name.length-1];
 					}
 				}, 100)
-			},
-			res_model: function () {
-				//            this.$store.state.resource = {
-				//                "res": {
-				//                    "id": "",
-				//                    "name": "默认资源名称",
-				//                    "category": "",
-				//                    "connectType": "0",
-				//                    "cache_name":"",
-				//                    "num": 0,
-				//                    "createUser": "",
-				//                    "createTime": "",
-				//                    "status": "0"
-				//                },
-				//                "resData": {
-				//                    "id": "",
-				//                    "resId": "",
-				//                    "dsId": "",
-				//                    "tableName": "",
-				//                    "diy": "",
-				//                    "diySql": "",
-				//                    "createTime": ""
-				//                },
-				//                "resColList": []
-				//            }
 			}
 		}
 	}
