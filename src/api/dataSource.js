@@ -91,7 +91,7 @@ export const findColsBySQL = (data) => {
 
 export const previewDataDetailed = (param) => {
   return axios.request({
-    url: '/dataSource/preloadData',
+    url: '/dataSource/loadData',
     params: param,
     method: 'get'
   })
