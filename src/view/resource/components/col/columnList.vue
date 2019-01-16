@@ -18,7 +18,7 @@
 			<Col span="24" size="small" class="form-input col-list">
 			<CellGroup>
 				<Cell class="col-list" v-show="item.status==='1'||showHideCol" :disabled="item.status==='0'" v-for="(item, index) in columnDatas"
-				 :title="item.col" :label="item.alias">
+				 :title="item.alias || item.col" :label="item.col">
 					<img class="col-type-icon" :src="colTypeIcon[item.changeType]" slot="icon">
 					<img class="col-type-icon" :src="colTypeIcon.varchar" v-show="!item.changeType" slot="icon">
 					<img class="col-type-icon" :src="colTypeIcon['pk']" slot="icon" v-if="item.pk==='1'">
@@ -73,7 +73,7 @@
 			columnFilter,
 			dictList
 		},
-		props: ['curDsType', 'previewData', 'columnDatas'],
+		props: ['columnDatas'],
 		data() {
 			return {
 				colloadingShow: false,
