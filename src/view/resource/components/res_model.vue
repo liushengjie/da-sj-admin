@@ -172,6 +172,7 @@
 					if(res.success) {
 						this.resource = res.data
 						this.getCols(this.resource)
+						console.log(res.data)
 					}else{
 						this.$Message.error({
 							content: '获取资源对象失败',
