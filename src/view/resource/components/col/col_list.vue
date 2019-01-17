@@ -56,24 +56,23 @@
 			</CellGroup>
 			</Col>
 		</Row>
-		<split @addSplit="addSplit" :dsType="curDsType" :colName="curSplitName" ref="split"></split>
-		<columnFilter :previewData="previewData" @renderColList="renderColList" :dsType="curDsType" :colList="columnDatas"
-		 ref="colList"></columnFilter>
+		<col-split :datasoureType="datasourceType" ref="colSplit"></col-split>
+		<columnFilter :previewData="previewData" @renderColList="renderColList" :dsType="datasourceType" :colList="columnDatas" ref="colList"></columnFilter>
 		<dictList ref="dictList" :curSplitName="curSplitName"></dictList>
 	</div>
 </template>
 <script>
-	import split from '@/view/resource/components/col/split'
-	import columnFilter from '@/view/resource/components/columnFilter'
-	import dictList from '@/view/resource/components/col/dictList'
+	import colSplit from '@/view/resource/components/col/col_split'
+	import columnFilter from '@/view/resource/components/cleaner/cleaner_main'
+	import dictList from '@/view/resource/components/col/col_dict'
 	import * as resApi from '@/api/resource'
 	export default {
 		components: {
-			split,
+			colSplit,
 			columnFilter,
 			dictList
 		},
-		props: ['columnDatas'],
+		props: ['columnDatas','datasourceType'],
 		data() {
 			return {
 				colloadingShow: false,
@@ -96,7 +95,7 @@
 			showMenuModal(e, item) {
 				this.curSplitName = item.col
 				if (e === 'split') {
-					this.$refs[e].modalShow = true
+					this.$refs.colSplit.modalShow = true
 					if (!this.colNameIndexObj) {
 						this.colNameIndexObj = new Object()
 						this.$store.state.resource.resColList.forEach(col => {

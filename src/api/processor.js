@@ -1,9 +1,9 @@
 import axios from '@/libs/api.request'
 
-export const queryProcessor = (data) => {
+export const fetchAvailableFunc = (param) => {
   return axios.request({
-    url: 'processor/queryProcessor',
-    data,
-    method: 'post'
+    url: 'processor/fetchAvailableFunc',
+    param:param,
+    method: 'get'
   })
 }

@@ -69,7 +69,7 @@
 </template>
 <script>
 	import * as resApi from '@/api/resource'
-	import categoryTree from '@/view/resource/components/category_tree'
+	import categoryTree from '@/components/tree/category_tree'
 	import resModel from '@/view/resource/components/res_model'
 	import vis from 'vis'
 	export default {

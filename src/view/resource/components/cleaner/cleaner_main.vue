@@ -24,9 +24,9 @@
 	</div>
 </template>
 <script>
-	import dateFilter from '@/view/resource/components/filterComponents/dateFilter'
-	import notnullFilter from '@/view/resource/components/filterComponents/notnullFilter'
-	import equalsFilter from '@/view/resource/components/filterComponents/equalsFilter'
+	import dateFilter from '@/view/resource/components/cleaner/form/dateFilter'
+	import notnullFilter from '@/view/resource/components/cleaner/form/notnullFilter'
+	import equalsFilter from '@/view/resource/components/cleaner/form/equalsFilter'
 	import vis from 'vis'
 	import * as procApi from '@/api/processor'
 	import * as dragUtils from '@/libs/dragUtils'

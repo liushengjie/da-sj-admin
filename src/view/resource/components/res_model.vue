@@ -15,8 +15,8 @@
 					</Row>
 					<Row>
 						<Col span="24" class="form-input" size="small">
-						<Select v-model="curDs" placeholder="请选择数据源" @on-change="getTableList">
-							<Option v-for="item in dsList" :value="item.id+'-'+item.type" :label="item.name">
+						<Select placeholder="请选择数据源" @on-change="getTableList">
+							<Option v-for="item in dsList" :value="item" :label="item.name">
 								<span>{{item.name}}</span>
 								<br>
 								<span>{{item.ip}}</span>
@@ -58,7 +58,7 @@
 									<a href="javascript:void(0)" v-show="connectType==1" @click="openConnSetting">编辑</a>
 								</div>
 							</div>
-							<colList ref="colList" :columnDatas="columnDatas"></colList>
+							<colList ref="colList" :columnDatas="columnDatas" :datasourceType="datasourceType"></colList>
 						</div>
 						<div slot="right" class="split-pane">
 							<Row>
@@ -89,7 +89,7 @@
 	import * as dbApi from '@/api/dataSource'
 	import * as resApi from '@/api/resource'
 	import connSetting from '@/view/resource/components/modals/connSetting'
-	import colList from '@/view/resource/components/col/columnList'
+	import colList from '@/view/resource/components/col/col_list'
 	import deleteIcon from '@/assets/images/u4511.png'
 	export default {
 		components: {
@@ -115,7 +115,9 @@
 				tableloadingShow: false, //左侧tablelist loading
 				dataloadingShow: false,  //右侧数据预览 loading
 				modalLoading: true,
-				curDs: '', //当前数据源id
+				datasourceId: '', //当前数据源id
+				datasourceType:'',
+				datasourceName:'',
 				dsList: [], //数据源列表
 				tables_data: [], //数据表列表
 				tableHeight: document.body.clientHeight - 189,
@@ -141,14 +143,15 @@
 				})
 			},
 			getTableList(data) {
-				const id = data.split('-')[0]
-				const type = data.split('-')[1]
-				if (!id) {
+				this.datasourceId = data.id
+				this.datasourceType = data.type
+
+				if (!this.datasourceId) {
 					return false
 				}
 				this.tableloadingShow = true
 				dbApi.getTables({
-					dataSource: id
+					dataSource: this.datasourceId
 				}).then(res => {
 					this.tableloadingShow = false
 					if (res.success) {
@@ -160,7 +163,7 @@
 								'drop-highlight',
 								dom => {
 									this.renderDropDiv(dom.find('.ivu-cell-title').text())
-									this.getResourceObj(id, dom.data('table'))
+									this.getResourceObj(this.datasourceId, dom.data('table'))
 								}
 							)
 						})
@@ -172,7 +175,6 @@
 					if(res.success) {
 						this.resource = res.data
 						this.getCols(this.resource)
-						console.log(res.data)
 					}else{
 						this.$Message.error({
 							content: '获取资源对象失败',

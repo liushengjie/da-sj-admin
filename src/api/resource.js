@@ -27,7 +27,7 @@ export const saveRes = (data) => {
 
 export const loadResObj = (param, data) => {
 	return axios.request({
-		url: '/res/loadResource',
+		url: '/res/loadResourceObj',
 		params: param,
 		data,
 		method: 'post'
