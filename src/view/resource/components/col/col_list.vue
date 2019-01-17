@@ -56,8 +56,7 @@
 			</CellGroup>
 			</Col>
 		</Row>
-		<col-split :datasoureType="datasourceType" ref="colSplit"></col-split>
-		<columnFilter :previewData="previewData" @renderColList="renderColList" :dsType="datasourceType" :colList="columnDatas" ref="colList"></columnFilter>
+		<col-split :functions="functions" ref="colSplit"></col-split>
 		<dictList ref="dictList" :curSplitName="curSplitName"></dictList>
 	</div>
 </template>
@@ -65,6 +64,7 @@
 	import colSplit from '@/view/resource/components/col/col_split'
 	import columnFilter from '@/view/resource/components/cleaner/cleaner_main'
 	import dictList from '@/view/resource/components/col/col_dict'
+	import * as procApi from '@/api/processor'
 	import * as resApi from '@/api/resource'
 	export default {
 		components: {
@@ -72,7 +72,7 @@
 			columnFilter,
 			dictList
 		},
-		props: ['columnDatas','datasourceType'],
+		props: ['columnDatas', 'datasourceType'],
 		data() {
 			return {
 				colloadingShow: false,
@@ -88,23 +88,19 @@
 					index: require('@/assets/images/col-type/index.png'),
 					pk: require('@/assets/images/col-type/pk.png')
 				},
-				colNameIndexObj: null
+				colNameIndexObj: null,
+				functions:[]
 			}
 		},
 		methods: {
 			showMenuModal(e, item) {
 				this.curSplitName = item.col
 				if (e === 'split') {
+					this.fetchAvailableFunc(this.datasourceType)
 					this.$refs.colSplit.modalShow = true
-					if (!this.colNameIndexObj) {
-						this.colNameIndexObj = new Object()
-						this.$store.state.resource.resColList.forEach(col => {
-							this.colNameIndexObj[col.col] = 1
-						})
-					}
 				} else if (e === 'addIndex') {
 					item.idx = '1'
-				}else if (e === 'removeIndex') {
+				} else if (e === 'removeIndex') {
 					item.idx = '0'
 				} else if (e === 'hide') {
 					item.status = '0'
@@ -115,6 +111,18 @@
 				} else if (e === 'show') {
 					item.status = '1'
 				}
+			},
+			fetchAvailableFunc(datasourceType) {
+				const param = {
+					datasourceType: datasourceType,
+					procType: 'col',
+				}
+				procApi.fetchAvailableFunc(param).then(res => {
+					if (res.success) {
+						this.functions = res.data
+						console.log(res.data)
+					}
+				})
 			},
 			addSplit(proc) {
 				let originCol = this.$store.state.resource.resColList[this.curSplitIndex].originCol || this.curSplitName

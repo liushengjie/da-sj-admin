@@ -3,7 +3,7 @@
 	 @on-ok="save" :loading="modalLoading">
 		<p slot="header">
 			<Icon type="ios-information-circle"></Icon>
-			<Input class="model-title-input" size="large" v-model="$store.state.resource.res.name" />
+			<Input class="model-title-input" size="large" />
 			<Cascader class="category" placeholder="资源类别" size="small" style="display: inline-block" :data="categoryList"
 			 v-model="curCategory.id" @on-change="changeCategory"></Cascader>
 		</p>
@@ -16,7 +16,7 @@
 					<Row>
 						<Col span="24" class="form-input" size="small">
 						<Select placeholder="请选择数据源" @on-change="getTableList">
-							<Option v-for="item in dsList" :value="item" :label="item.name">
+							<Option v-for="item in dsList" :value="JSON.stringify(item)" :label="item.name">
 								<span>{{item.name}}</span>
 								<br>
 								<span>{{item.ip}}</span>
@@ -143,8 +143,8 @@
 				})
 			},
 			getTableList(data) {
-				this.datasourceId = data.id
-				this.datasourceType = data.type
+				this.datasourceId = JSON.parse(data).id
+				this.datasourceType = JSON.parse(data).type
 
 				if (!this.datasourceId) {
 					return false
@@ -236,7 +236,6 @@
 				} else {
 					this.renderDropDiv(this.$store.state.resource.resData.alias || this.$store.state.resource.resData.tableName)
 				}
-				this.renderColList(true)
 			},
 			// 关闭SQL窗口并初始化相关数据
 			initData() {
