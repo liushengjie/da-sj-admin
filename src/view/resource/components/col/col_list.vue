@@ -72,7 +72,7 @@
 			columnFilter,
 			dictList
 		},
-		props: ['columnDatas', 'datasourceType'],
+		props: ['datasourceType'],
 		data() {
 			return {
 				colloadingShow: false,
@@ -145,6 +145,11 @@
 			},
 			showColList() {
 				this.$refs.colList.colListShow = true
+			}
+		},
+		computed:{
+			columnDatas(){
+				return this.$store.getters.resCols;
 			}
 		}
 	}

@@ -3,7 +3,7 @@
 	 @on-ok="save" :loading="modalLoading">
 		<p slot="header">
 			<Icon type="ios-information-circle"></Icon>
-			<Input class="model-title-input" size="large" />
+			<Input class="model-title-input" size="large"/>
 			<Cascader class="category" placeholder="资源类别" size="small" style="display: inline-block" :data="categoryList"
 			 v-model="curCategory.id" @on-change="changeCategory"></Cascader>
 		</p>
@@ -58,7 +58,7 @@
 									<a href="javascript:void(0)" v-show="connectType==1" @click="openConnSetting">编辑</a>
 								</div>
 							</div>
-							<colList ref="colList" :columnDatas="columnDatas" :datasourceType="datasourceType"></colList>
+							<colList ref="colList"></colList>
 						</div>
 						<div slot="right" class="split-pane">
 							<Row>
@@ -106,18 +106,14 @@
 				split1: 0.15,
 				split2: 0.2,
 				categoryList: [],
-
 				renameTitle: '',
 				curEditColIndex: 0,
 				resource:{}, //// 资源对象
 				connectType:'0', //// 连接方式
-				columnDatas:[], // 列数据信息
 				tableloadingShow: false, //左侧tablelist loading
 				dataloadingShow: false,  //右侧数据预览 loading
 				modalLoading: true,
 				datasourceId: '', //当前数据源id
-				datasourceType:'',
-				datasourceName:'',
 				dsList: [], //数据源列表
 				tables_data: [], //数据表列表
 				tableHeight: document.body.clientHeight - 189,
@@ -143,8 +139,8 @@
 				})
 			},
 			getTableList(data) {
+				this.$store.commit('setDatasource',JSON.parse(data))
 				this.datasourceId = JSON.parse(data).id
-				this.datasourceType = JSON.parse(data).type
 
 				if (!this.datasourceId) {
 					return false
@@ -174,7 +170,7 @@
 				resApi.loadResObj({'datasourceId':datasourceId},table).then(res => {
 					if(res.success) {
 						this.resource = res.data
-						this.getCols(this.resource)
+						this.$store.commit('setResource',this.resource)
 					}else{
 						this.$Message.error({
 							content: '获取资源对象失败',
@@ -195,20 +191,6 @@
 					//_this.initData()
 				})
 			},
-			// 获取列内容列表
-			getCols(resource) {
-				this.$refs.colList.colloadingShow = true
-				resApi.loadResCols(resource).then(res => {
-					this.$refs.colList.colloadingShow = false
-					if (res.success) {
-						this.columnDatas = res.data
-					} else {
-						this.$refs.colList.colloadingShow = false
-					}
-				}).catch(e => {
-					this.$refs.colList.colloadingShow = false
-				})
-			},
 			// 获取预览数据内容
 			getPreviewData() {
 				this.previewData = []
@@ -223,19 +205,17 @@
 				})
 			},
 			rename() {
-				this.$store.state.resource.resColList[
-					this.curEditColIndex
-				].name = this.renameTitle
+				//this.$store.commit('setResourceName',this.renameTitle)
 			},
 			// 回显数据
 			reviewData() {
-				this.getTableList(this.$store.state.resource.resData.dsId)
-				$('.category').find('input').val(this.$store.state.resource.res.categoryName)
-				if (this.$store.state.resource.resData.diy === '1') {
-					this.renderDropDiv('新自定义SQL')
-				} else {
-					this.renderDropDiv(this.$store.state.resource.resData.alias || this.$store.state.resource.resData.tableName)
-				}
+				// this.getTableList(this.$store.state.resource.resData.dsId)
+				// $('.category').find('input').val(this.$store.state.resource.res.categoryName)
+				// if (this.$store.state.resource.resData.diy === '1') {
+				// 	this.renderDropDiv('新自定义SQL')
+				// } else {
+				// 	this.renderDropDiv(this.$store.state.resource.resData.alias || this.$store.state.resource.resData.tableName)
+				// }
 			},
 			// 关闭SQL窗口并初始化相关数据
 			initData() {
@@ -245,17 +225,17 @@
 			// 关闭窗口并初始化数据
 			closeModal() {
 				setTimeout(() => {
-					this.$store.state.resource.resData.dsId = 0
-					this.tables_data = []
-					this.show_diy_sql_btn = false
-					this.showLines = 50
-					this.$store.state.resource.res.connectType = '0'
-					this.curCategory = {
-						id: [],
-						name: []
-					}
-					this.initData()
-					this.$store.state.resource.res.name = '默认资源名称'
+					// this.$store.state.resource.resData.dsId = 0
+					// this.tables_data = []
+					// this.show_diy_sql_btn = false
+					// this.showLines = 50
+					// this.$store.state.resource.res.connectType = '0'
+					// this.curCategory = {
+					// 	id: [],
+					// 	name: []
+					// }
+					// this.initData()
+					// this.$store.state.resource.res.name = '默认资源名称'
 				}, 10)
 			},
 			getParent(array, childIds, childNames, selectedId) {
@@ -312,6 +292,9 @@
 				})
 			}
 		},
+		computed:{
+		},
+
 		watch: {
 			categoryList: function () {
 				setTimeout(() => {

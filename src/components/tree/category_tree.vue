@@ -62,7 +62,6 @@
 				}
 			},
 			onChange(node, e) {
-				console.log(node)
 				this.$store.state.resource.res.category = node[0].id
 			},
 			noadd(params) {
