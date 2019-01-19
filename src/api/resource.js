@@ -11,7 +11,7 @@ export const previewData = (data, param) => {
 
 export const queryResListByPage = (param) => {
 	return axios.request({
-		url: '/res/queryResListByPage',
+		url: '/res/selectResourceViewListByPage',
 		params: param,
 		method: 'get'
 	})
@@ -19,7 +19,7 @@ export const queryResListByPage = (param) => {
 
 export const saveRes = (data) => {
 	return axios.request({
-		url: '/res/saveRes',
+		url: '/res/saveResource',
 		data,
 		method: 'post'
 	})
@@ -44,7 +44,7 @@ export const loadResCols = (data) => {
 
 export const getRes = (param) => {
 	return axios.request({
-		url: '/res/findResBean',
+		url: '/res/selectResourceById',
 		params: param,
 		method: 'get'
 	})
@@ -53,7 +53,7 @@ export const getRes = (param) => {
 //查询所有的资源
 export const queryResAll = () => {
 	return axios.request({
-		url: '/res/queryResAll',
+		url: '/res/selectResourceList',
 		method: 'get'
 	})
 }
