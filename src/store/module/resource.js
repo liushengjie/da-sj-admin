@@ -1,7 +1,11 @@
 import * as dbApi from '@/api/dataSource'
 export default {
 	state: {
-		'resource': {},
+		'resource': {
+			'resourceBody': {
+				'name': '默认资源名称'
+			}
+		},
 		'datasource': {},
 	},
 	mutations: {
@@ -11,19 +15,40 @@ export default {
 		setDatasource: (state, datasource) => {
 			state.datasource = datasource
 		},
-		setResourceName: (state, name) =>{
+		setResourceName: (state, name) => {
 			state.resource.resourceBody.name = name
+		},
+		setResourceCategory: (state, name) => {
+			state.resource.resourceBody.category = name
 		}
 	},
 	actions: {
-
+		initRes: (context) => {
+			var res = {
+				'resourceBody': {
+					'name': '默认资源名称'
+				}
+			}
+			context.commit('setResource', res)
+		},
+		assignResObj: (context, res) => {
+			res.resourceBody.name = context.state.resource.resourceBody.name
+			res.resourceBody.category = context.state.resource.resourceBody.category
+			context.commit('setResource', res)
+		}
 	},
 	getters: {
 		resCols: (state) => {
 			return state.resource.resourceCols
 		},
-		resName: (state) => {
-			return state.resource.hasOwnProperty('resourceBody') && state.resource.resourceBody.name != "" ? state.resource.resourceBody.name : "默认资源名称"
+		res_name: (state) => {
+			return state.resource.resourceBody.name
+		},
+		res_category: (state) =>{
+			return state.resource.resourceBody.category
+		},
+		datasource_id: (state) => {
+			return state.datasource.id
 		}
 	}
 }

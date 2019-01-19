@@ -147,10 +147,12 @@
 				})
 			},
 			openResModel() {
-				this.$refs.resModel.res_model = true
+				//新增
 				let obj = Object.assign([], this.$refs.categoryTree.category_data)
 				this.getCategoryList(obj)
 				this.$refs.resModel.categoryList = obj
+				this.$store.dispatch('initRes')
+				this.$refs.resModel.res_model = true
 			},
 			getCategoryList(obj) {
 				obj.forEach(item => {

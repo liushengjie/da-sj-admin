@@ -72,7 +72,6 @@
 			columnFilter,
 			dictList
 		},
-		props: ['datasourceType'],
 		data() {
 			return {
 				colloadingShow: false,
@@ -96,7 +95,7 @@
 			showMenuModal(e, item) {
 				this.curSplitName = item.col
 				if (e === 'split') {
-					this.fetchAvailableFunc(this.datasourceType)
+					this.fetchAvailableFunc(this.$store.state.resource.datasource.type)
 					this.$refs.colSplit.modalShow = true
 				} else if (e === 'addIndex') {
 					item.idx = '1'

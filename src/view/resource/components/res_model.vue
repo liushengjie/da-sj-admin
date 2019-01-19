@@ -3,9 +3,9 @@
 	 @on-ok="save" :loading="modalLoading">
 		<p slot="header">
 			<Icon type="ios-information-circle"></Icon>
-			<Input class="model-title-input" size="large"/>
+			<Input class="model-title-input" size="large" v-model="res_name" />
 			<Cascader class="category" placeholder="资源类别" size="small" style="display: inline-block" :data="categoryList"
-			 v-model="curCategory.id" @on-change="changeCategory"></Cascader>
+		    @on-change="changeCategory"></Cascader>
 		</p>
 		<div class="split">
 			<Split v-model="split1" min="50px" max="100px">
@@ -32,8 +32,8 @@
 						</Col>
 						<Col span="24" class="form-input table-list ele-scroll" size="small">
 						<CellGroup>
-							<Cell v-for="item in tables_data" :data-table="JSON.stringify(item)" :title="item.alias || item.tableName" :label="item.tableName"
-							 class="draggable">
+							<Cell v-for="item in tables_data" :data-table="JSON.stringify(item)" :title="item.alias || item.tableName"
+							 :label="item.tableName" class="draggable">
 								<Icon type="md-grid" slot="icon" />
 							</Cell>
 						</CellGroup>
@@ -55,7 +55,7 @@
 										<Radio label="0">实时</Radio>
 										<Radio label="1">数据提取</Radio>
 									</RadioGroup>
-									<a href="javascript:void(0)" v-show="connectType==1" @click="openConnSetting">编辑</a>
+									<a href="javascript:void(0)" v-show="connectType==1" @click="openConnectSetting">编辑</a>
 								</div>
 							</div>
 							<colList ref="colList"></colList>
@@ -81,19 +81,19 @@
 		<Modal title="重命名" v-model="colRenameModal" on-ok="rename">
 			<Input v-model="renameTitle"></Input>
 		</Modal>
-		<conn-setting ref="connSetting"></conn-setting>
+		<connect-setting ref="connectSetting"></connect-setting>
 	</Modal>
 </template>
 <script>
 	import * as dragUtils from '@/libs/dragUtils'
 	import * as dbApi from '@/api/dataSource'
 	import * as resApi from '@/api/resource'
-	import connSetting from '@/view/resource/components/modals/connSetting'
+	import connectSetting from '@/view/resource/components/modals/connSetting'
 	import colList from '@/view/resource/components/col/col_list'
 	import deleteIcon from '@/assets/images/u4511.png'
 	export default {
 		components: {
-			connSetting,
+			connectSetting,
 			colList
 		},
 		data() {
@@ -105,13 +105,13 @@
 				showLines: 50,
 				split1: 0.15,
 				split2: 0.2,
-				categoryList: [],
+				categoryList: [], //资源类别
 				renameTitle: '',
 				curEditColIndex: 0,
-				resource:{}, //// 资源对象
-				connectType:'0', //// 连接方式
+				resource: {}, //// 资源对象
+				connectType: '0', //// 连接方式
 				tableloadingShow: false, //左侧tablelist loading
-				dataloadingShow: false,  //右侧数据预览 loading
+				dataloadingShow: false, //右侧数据预览 loading
 				modalLoading: true,
 				datasourceId: '', //当前数据源id
 				dsList: [], //数据源列表
@@ -119,7 +119,7 @@
 				tableHeight: document.body.clientHeight - 189,
 				res_model: false,
 				colRenameModal: false,
-				previewCols:[],
+				previewCols: [],
 				previewData: [],
 			}
 		},
@@ -139,15 +139,10 @@
 				})
 			},
 			getTableList(data) {
-				this.$store.commit('setDatasource',JSON.parse(data))
-				this.datasourceId = JSON.parse(data).id
-
-				if (!this.datasourceId) {
-					return false
-				}
+				this.$store.commit('setDatasource', JSON.parse(data))
 				this.tableloadingShow = true
 				dbApi.getTables({
-					dataSource: this.datasourceId
+					dataSource: this.datasource_id
 				}).then(res => {
 					this.tableloadingShow = false
 					if (res.success) {
@@ -159,19 +154,21 @@
 								'drop-highlight',
 								dom => {
 									this.renderDropDiv(dom.find('.ivu-cell-title').text())
-									this.getResourceObj(this.datasourceId, dom.data('table'))
+									this.getResourceObj(this.datasource_id, dom.data('table'))
 								}
 							)
 						})
 					}
 				})
 			},
-			getResourceObj(datasourceId, table){
-				resApi.loadResObj({'datasourceId':datasourceId},table).then(res => {
-					if(res.success) {
+			getResourceObj(datasourceId, table) {
+				resApi.loadResObj({
+					'datasourceId': this.datasource_id
+				}, table).then(res => {
+					if (res.success) {
 						this.resource = res.data
-						this.$store.commit('setResource',this.resource)
-					}else{
+						this.$store.dispatch('assignResObj', this.resource)
+					} else {
 						this.$Message.error({
 							content: '获取资源对象失败',
 							duration: 3
@@ -217,25 +214,17 @@
 				// 	this.renderDropDiv(this.$store.state.resource.resData.alias || this.$store.state.resource.resData.tableName)
 				// }
 			},
-			// 关闭SQL窗口并初始化相关数据
-			initData() {
-				$('.category').find('input').val('')
-				$('.dropDiv').empty()
-			},
 			// 关闭窗口并初始化数据
 			closeModal() {
 				setTimeout(() => {
-					// this.$store.state.resource.resData.dsId = 0
-					// this.tables_data = []
-					// this.show_diy_sql_btn = false
-					// this.showLines = 50
-					// this.$store.state.resource.res.connectType = '0'
-					// this.curCategory = {
-					// 	id: [],
-					// 	name: []
-					// }
-					// this.initData()
-					// this.$store.state.resource.res.name = '默认资源名称'
+					this.tables_data = []
+					this.showLines = 50
+					this.curCategory = {
+						id: [],
+						name: []
+					}
+					$('.category').find('input').val('')
+					$('.dropDiv').empty()
 				}, 10)
 			},
 			getParent(array, childIds, childNames, selectedId) {
@@ -263,10 +252,10 @@
 				}
 			},
 			changeCategory(val, selectData) {
-				this.$store.state.resource.res.category = val[val.length - 1]
+				this.$store.commit('setResourceCategory', val[val.length - 1])
 			},
-			openConnSetting() {
-				this.$refs.connSetting.modalShow = true
+			openConnectSetting() {
+				this.$refs.connectSetting.modalShow = true
 			},
 			save() {
 				if (!this.$store.state.resource.res.category) {
@@ -292,7 +281,26 @@
 				})
 			}
 		},
-		computed:{
+		computed: {
+			res_name: {
+				get() {
+					return this.$store.getters.res_name
+				},
+				set(value) {
+					this.$store.commit('setResourceName', value)
+				}
+			},
+			res_category: {
+				get() {
+					return this.$store.getters.res_category
+				},
+				set(value) {
+					this.$store.commit('setResourceCategory', value)
+				}
+			},
+			datasource_id(){
+				return this.$store.getters.datasource_id
+			}
 		},
 
 		watch: {
@@ -388,7 +396,7 @@
 
 	.result-row {
 		#height: calc(100% - 58px);
-		height:100%;
+		height: 100%;
 	}
 
 	.col-row {
