@@ -121,6 +121,15 @@
 				colRenameModal: false,
 				previewCols: [],
 				previewData: [],
+				colTypeIcon: {
+					date: require('@/assets/images/col-type/date.png'),
+					varchar: require('@/assets/images/col-type/varchar.png'),
+					datetime: require('@/assets/images/col-type/datetime.png'),
+					float: require('@/assets/images/col-type/float.png'),
+					int: require('@/assets/images/col-type/int.png'),
+					index: require('@/assets/images/col-type/index.png'),
+					pk: require('@/assets/images/col-type/pk.png')
+				},
 			}
 		},
 		mounted() {
@@ -189,10 +198,37 @@
 				})
 			},
 			// 获取预览数据内容
-			getPreviewData() {
+			getPreviewData(previewCols) {
 				this.previewData = []
+				this.previewCols = []
+				previewCols.forEach(item => {
+					if (item.status === '1') {
+						this.previewCols.push({
+							title: item.alias || item.col,
+							key: item.col.toLowerCase(),
+							tooltip: true,
+							minWidth: 100,
+							renderHeader: (h, params) => {
+								return h('div', [
+									h('img', {
+										attrs: {
+											src: item.changeType ? this.colTypeIcon[item.changeType] : this.colTypeIcon['varchar']
+										},
+										style: {
+											width: '14px'
+										},
+										class: 'col-type-icon'
+									}),
+									h('div', item.alias || item.col)
+								])
+							}
+						})
+					}
+				})
+
+
 				this.dataloadingShow = true
-				resApi.previewData(this.$store.state.resource, {
+				resApi.previewData(this.$store.state.resource.resource, {
 					'limit': 50
 				}).then(res => {
 					this.previewData = res.data
@@ -300,6 +336,9 @@
 			},
 			datasource_id(){
 				return this.$store.getters.datasource_id
+			},
+			resourceCols_watch(){
+				return this.$store.state.resource.resource.resourceCols
 			}
 		},
 
@@ -314,6 +353,10 @@
 						this.$store.state.resource.res.category = this.curCategory.id[this.curCategory.id.length - 1]
 					}
 				}, 100)
+			},
+			resourceCols_watch: function(n, o) {
+				console.log(n)
+				this.getPreviewData(n)
 			}
 		}
 	}

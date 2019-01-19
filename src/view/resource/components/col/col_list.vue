@@ -56,7 +56,7 @@
 			</CellGroup>
 			</Col>
 		</Row>
-		<col-split :functions="functions" ref="colSplit"></col-split>
+		<col-split :functions="functions" :col="col" ref="colSplit"></col-split>
 		<dictList ref="dictList" :curSplitName="curSplitName"></dictList>
 	</div>
 </template>
@@ -88,14 +88,15 @@
 					pk: require('@/assets/images/col-type/pk.png')
 				},
 				colNameIndexObj: null,
-				functions:[]
+				functions:[],
+				col:''
 			}
 		},
 		methods: {
 			showMenuModal(e, item) {
-				this.curSplitName = item.col
 				if (e === 'split') {
 					this.fetchAvailableFunc(this.$store.state.resource.datasource.type)
+					this.col = item
 					this.$refs.colSplit.modalShow = true
 				} else if (e === 'addIndex') {
 					item.idx = '1'
@@ -119,27 +120,7 @@
 				procApi.fetchAvailableFunc(param).then(res => {
 					if (res.success) {
 						this.functions = res.data
-						console.log(res.data)
 					}
-				})
-			},
-			addSplit(proc) {
-				let originCol = this.$store.state.resource.resColList[this.curSplitIndex].originCol || this.curSplitName
-				let newColName = originCol + '_' + this.colNameIndexObj[originCol]
-				this.colNameIndexObj[originCol]++
-				this.$store.state.resource.resColList.push({
-					id: '',
-					resId: '',
-					origin: this.curSplitName,
-					aliasId: '自定义拆分表格_' + this.curSplitName,
-					colAlias: '自定义拆分表格_' + this.curSplitName,
-					changeType: this.$store.state.resource.resColList[this.curSplitIndex].changeType,
-					type: this.$store.state.resource.resColList[this.curSplitIndex].type,
-					attr: '0',
-					col: newColName,
-					colCache: newColName,
-					status: '1',
-					proc: [proc]
 				})
 			},
 			showColList() {

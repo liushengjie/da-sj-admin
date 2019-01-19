@@ -20,6 +20,9 @@ export default {
 		},
 		setResourceCategory: (state, name) => {
 			state.resource.resourceBody.category = name
+		},
+		setResourceCol:(state, col) => {
+			state.resource.resourceCols.push(col)
 		}
 	},
 	actions: {
@@ -35,7 +38,8 @@ export default {
 			res.resourceBody.name = context.state.resource.resourceBody.name
 			res.resourceBody.category = context.state.resource.resourceBody.category
 			context.commit('setResource', res)
-		}
+		},
+
 	},
 	getters: {
 		resCols: (state) => {

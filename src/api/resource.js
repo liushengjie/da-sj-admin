@@ -34,14 +34,6 @@ export const loadResObj = (param, data) => {
 	})
 }
 
-export const loadResCols = (data) => {
-	return axios.request({
-		url: '/res/loadResourceCols',
-		data,
-		method: 'post'
-	})
-}
-
 export const getRes = (param) => {
 	return axios.request({
 		url: '/res/selectResourceById',

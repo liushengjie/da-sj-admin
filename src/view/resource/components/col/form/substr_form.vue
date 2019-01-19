@@ -1,14 +1,14 @@
 <template>
 	<div>
-		<RadioGroup vertical v-model="form.type">
+		<RadioGroup vertical v-model="params.type">
 			<Radio label="0">
-				左截取 <InputNumber :min="1" v-model="form.end"></InputNumber>
+				左截取 <InputNumber :min="1" v-model="params.len"></InputNumber>
 			</Radio>
 			<Radio label="1">
-				右截取 <InputNumber :min="1" v-model="form.begin"></InputNumber>
+				右截取 <InputNumber :min="1" v-model="params.len"></InputNumber>
 			</Radio>
 			<Radio label="2">
-				自定义 <InputNumber :min="1" v-model="form.customBegin"></InputNumber> 列 至 <InputNumber v-model="form.customEnd"></InputNumber>
+				自定义 <InputNumber :min="1" v-model="params.startIndex"></InputNumber> 列 至 <InputNumber v-model="params.endIndex"></InputNumber>
 				列
 			</Radio>
 		</RadioGroup>
@@ -19,29 +19,11 @@
 		mounted() {},
 		data() {
 			return {
-				form: {
-					type: '0',
-					begin: 1,
-					end: 1,
-					customBegin: 1,
-					customEnd: 1
+				params: {
+					subType: '0',
+					startIndex: 1,
+					endIndex: 1,
 				}
-			}
-		},
-		computed: {
-			params() {
-				let param = new Object()
-				if (this.form.type === '0') {
-					param.lr = 'left'
-					param.len = this.form.end
-				} else if (this.form.type === '1') {
-					param.lr = 'right'
-					param.len = this.form.begin
-				} else {
-					param.begin = this.form.customBegin
-					param.end = this.form.customEnd
-				}
-				return param
 			}
 		}
 	}
